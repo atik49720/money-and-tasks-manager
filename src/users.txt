@@ -1,3 +1,2 @@
-1
-0 user pass
-1 atik atikpass
+atik atikpass
+rupom rupom
