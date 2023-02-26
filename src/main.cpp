@@ -1,6 +1,8 @@
 #include<iostream>
 #include<fstream>
 #include<ctime>
+#include<string>
+#include<iomanip> 
 #include<windows.h>
 
 using namespace std;
@@ -35,7 +37,7 @@ void displayHeader(string dateTime)
 void displayWrongInput()
 {
     system("cls");
-    cout<<"Wrong Input!"<<endl<<endl;\
+    cout<<"Wrong Input!"<<endl<<endl;
 }
 
 string takePasswordFromUser()
@@ -110,6 +112,25 @@ string getLoggedInUser()
     return temp;
 }
 
+string setType()
+{
+    int op;
+    string temp;
+    cout<<"1. Income"<<endl<<"2. Expense"<<endl<<"3. Transfer"<<endl<<"4. Tasks"<<endl;
+    cout<<"Select Your Option:"<<endl;
+    cin>>op;
+    switch(op)
+    {
+        case 1: temp = "Income"; break;
+        case 2: temp = "Expense"; break;
+        case 3: temp = "Transfer"; break;
+        case 4: temp = "Tasks"; break;
+        default: temp = "Wrong"; displayWrongInput();
+    }
+
+    return temp;
+}
+
 string setAccount()
 {
     int op;
@@ -128,6 +149,64 @@ string setAccount()
     return temp;
 }
 
+void splitString(string given_str, string tmpLoggedInUser, string tmpAddType)
+{
+string delim = "<=>";
+size_t pos = 0;  
+string token1;
+
+int temp = 1;
+string DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
+while (( pos = given_str.find (delim)) != string::npos)
+{  
+    token1 = given_str.substr(0, pos);
+    if(temp == 1)
+    {
+        DateTime = token1;
+    }
+    else if(temp == 2)
+    {
+        addType = token1;
+        if(addType != tmpAddType)
+        {
+            return;
+        }
+    }
+    else if(temp == 3)
+    {
+        inAccount = token1;
+    }
+    else if(temp == 4)
+    {
+        toAccount = token1;
+    }
+    else if(temp == 5)
+    {
+        amount = token1;
+    }
+    else
+    {
+        LoggedInUser = token1;
+        if(LoggedInUser != tmpLoggedInUser)
+        {
+            return;
+        }
+    }
+    temp++;
+    given_str.erase(0, pos + delim.length()); 
+}
+note = given_str;
+
+if(tmpAddType == "Transfer")
+{
+    cout<<DateTime<<" "<<inAccount<<" "<<toAccount<<" "<<amount<<" "<<note<<endl;
+}
+else
+{
+    cout<<DateTime<<" "<<inAccount<<" "<<amount<<" "<<note<<endl;
+}
+}
+
 class softUser{
     public:
 
@@ -140,25 +219,20 @@ class softUser{
         int amount = 0;
         string note = "N/A";
         system("cls");
-        cout<<"Available Type for Adding:"<<endl<<"1. Income"<<endl<<"2. Expense"<<endl<<"3. Transfer"<<endl<<"4. Tasks"<<endl;
-        cout<<"Select Your Option:"<<endl;
-        cin>>op;
-        switch(op)
+        cout<<"Available Type for Adding:"<<endl;
+        addType = setType();
+        if(addType != "Wrong")
         {
-            case 1: addType = "Income"; break;
-            case 2: addType = "Expense"; break;
-            case 3: addType = "Transfer"; break;
-            case 4: addType = "Tasks"; break;
-            default: displayWrongInput();
-        }
-        if(op>= 1 && op <=4)
-        {
-            if(op>=1 && op <=3)
+            if(addType == "Income" || addType == "Expense" || addType == "Transfer")
             {
                 cout<<"Account:"<<endl;
                 inAccount = setAccount();
             }
-            if(op == 3)
+            else
+            {
+                inAccount = "Pending";
+            }
+            if(addType == "Transfer")
             {
                 cout<<"to Account:"<<endl;
                 toAccount = setAccount();
@@ -201,6 +275,47 @@ class softUser{
         }
     }
     
+    void userViewAction(string LoggedInUser)
+    {
+        int op;
+        string addType;
+        system("cls");
+        cout<<"Available Type for Viewing:"<<endl;
+        addType = setType();
+        if(addType != "Wrong")
+        {
+            system("cls");
+            string getLine;
+            ifstream MyRecordFile("DB.txt");
+            cout<<"All "<<addType<<" of User: "<<LoggedInUser<<endl<<endl;
+            if(addType == "Transfer")
+            {
+                cout<<"DateTime Account toAccount Amount Note"<<endl;
+            }
+            else if(addType == "Tasks")
+            {
+                cout<<"DateTime Status Amount Note"<<endl;
+            }
+            else
+            {
+                cout<<"DateTime Account Amount Note"<<endl;
+            }
+            while (getline (MyRecordFile, getLine))
+            {
+                splitString(getLine, LoggedInUser, addType);
+            }
+            cout<<endl;
+            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<endl;
+            cout<<"Select Your Option:"<<endl;
+            cin>>op;
+            switch(op)
+            {
+                case 1: system("cls"); break;
+                default: displayWrongInput();
+            }
+        }
+    }
+
     void userDashboard(string LoggedInUser)
     {
         displayHeader(getDateTime());
@@ -222,20 +337,18 @@ class softUser{
         cout<<"4. Delete"<<endl;
         cout<<"5. Exit"<<endl;
         cout<<"Select Your Option:"<<endl;
-        int op;
+        char op;
         cin>>op;
         switch(op)
         {
-            case 1: userAddAction(getDateTime(), getLoggedInUser()); userDashboard(getLoggedInUser()); break;
-            case 2: ; break;
-            case 3: ; break;
-            case 4: ; break;
-            case 5: ; break;
-            default: displayWrongInput(); userDashboard(getLoggedInUser());
+            case '1': userAddAction(getDateTime(), getLoggedInUser()); userDashboard(getLoggedInUser()); break;
+            case '2': userViewAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
+            case '3': userDashboard(getLoggedInUser()); break;
+            case '4': userDashboard(getLoggedInUser()); break;
+            case '5': break;
+            default: displayWrongInput(); userDashboard(getLoggedInUser()); break;
         }
-
     }
-
 };
 
 int main()
