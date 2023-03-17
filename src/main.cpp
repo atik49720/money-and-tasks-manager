@@ -4,6 +4,7 @@
 #include<string>
 #include<iomanip> 
 #include<windows.h>
+#include<conio.h>
 
 using namespace std;
 
@@ -67,12 +68,35 @@ string takePasswordFromUser()
     return ipt;
 }
 
+string takePasswordFromUser2() {
+    string pass = "";
+    char c;
+    while (true) {
+        c = _getch();
+        if (c == 13) { // if enter key is pressed
+            cout << endl;
+            break;
+        }
+        else if (c == 8) { // if backspace is pressed
+            if (pass.length() > 0) {
+                pass.erase(pass.length() - 1);
+                cout << "\b \b";
+            }
+        }
+        else {
+            pass += c;
+            cout << "*";
+        }
+    }
+    return pass;
+}
+
 string userLogin(){
     string user, pass;
     cout<<"Username:"<<endl;
     getline(cin, user);
     cout<<"Password:"<<endl;
-    pass = takePasswordFromUser();
+    pass = takePasswordFromUser2();
 
     ofstream tempLoggedInUser("temp.txt");
     tempLoggedInUser<<user;
@@ -149,22 +173,51 @@ string setAccount()
     return temp;
 }
 
+void deleteLine(const char *file_name, int n)
+{
+    char op;
+    cout<<"Are You Sure? Y/N"<<endl;
+    cin>>op;
+    if(op == 'Y' || op == 'y')
+    {  
+        ifstream is(file_name);
+        ofstream ofs;
+        ofs.open("tempDB.txt", ofstream::out);
+        char c;
+        int line_no = 1;
+        while (is.get(c))
+        {
+            if (c == '\n')
+            line_no++;
+            if (line_no != n)
+                ofs << c;
+        }
+        ofs.close();
+        is.close();
+        remove(file_name);
+        rename("tempDB.txt", file_name);
+    }
+}
+
 void splitString(string given_str, string tmpLoggedInUser, string tmpAddType)
 {
 string delim = "<=>";
 size_t pos = 0;  
 string token1;
-
-int temp = 1;
-string DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
+int temp = 1, flag = 0;
+string ID, DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
 while (( pos = given_str.find (delim)) != string::npos)
 {  
     token1 = given_str.substr(0, pos);
     if(temp == 1)
     {
-        DateTime = token1;
+        ID = token1;
     }
     else if(temp == 2)
+    {
+        DateTime = token1;
+    }
+    else if(temp == 3)
     {
         addType = token1;
         if(addType != tmpAddType)
@@ -172,15 +225,15 @@ while (( pos = given_str.find (delim)) != string::npos)
             return;
         }
     }
-    else if(temp == 3)
+    else if(temp == 4)
     {
         inAccount = token1;
     }
-    else if(temp == 4)
+    else if(temp == 5)
     {
         toAccount = token1;
     }
-    else if(temp == 5)
+    else if(temp == 6)
     {
         amount = token1;
     }
@@ -193,18 +246,125 @@ while (( pos = given_str.find (delim)) != string::npos)
         }
     }
     temp++;
-    given_str.erase(0, pos + delim.length()); 
+    given_str.erase(0, pos + delim.length());
 }
 note = given_str;
-
 if(tmpAddType == "Transfer")
 {
-    cout<<DateTime<<" "<<inAccount<<" "<<toAccount<<" "<<amount<<" "<<note<<endl;
+    cout<<ID<<" "<<DateTime<<" "<<inAccount<<" "<<toAccount<<" "<<amount<<" "<<note<<endl;
 }
 else
 {
-    cout<<DateTime<<" "<<inAccount<<" "<<amount<<" "<<note<<endl;
+    cout<<ID<<" "<<DateTime<<" "<<inAccount<<" "<<amount<<" "<<note<<endl;
 }
+}
+
+int getLineNo(string tmpID, string tmpLoggedInUser)
+{
+    string delim = "<=>";
+    size_t pos = 0;  
+    string token1;
+    int Line = 0;
+    string strID, DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
+    string getLine;
+    ifstream MyRecordFile("DB.txt");
+    while (getline (MyRecordFile, getLine))
+    {
+        Line++; 
+        int temp = 1;
+        while (( pos = getLine.find (delim)) != string::npos)
+        {  
+            token1 = getLine.substr(0, pos);
+            if(temp == 1)
+            {
+                strID = token1;
+            }
+            else if(temp == 2)
+            {
+                DateTime = token1;
+            }
+            else if(temp == 3)
+            {
+                addType = token1;
+            }
+            else if(temp == 4)
+            {
+                inAccount = token1;
+            }
+            else if(temp == 5)
+            {
+                toAccount = token1;
+            }
+            else if(temp == 6)
+            {
+                amount = token1;
+            }
+            else
+            {
+                LoggedInUser = token1;
+            }
+            getLine.erase(0, pos + delim.length());
+            temp++;
+        }
+        if(strID == tmpID && LoggedInUser == tmpLoggedInUser)
+        {
+            return Line;
+        }
+    }
+
+    return 0;
+}
+
+int getMaxID()
+{
+    string delim = "<=>";
+    size_t pos = 0;  
+    string token1;
+    int Line = 0;
+    string strID, DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
+    string getLine;
+    ifstream MyRecordFile("DB.txt");
+    while (getline (MyRecordFile, getLine))
+    {
+        Line++; 
+        int temp = 1;
+        while (( pos = getLine.find (delim)) != string::npos)
+        {  
+            token1 = getLine.substr(0, pos);
+            if(temp == 1)
+            {
+                strID = token1;
+            }
+            else if(temp == 2)
+            {
+                DateTime = token1;
+            }
+            else if(temp == 3)
+            {
+                addType = token1;
+            }
+            else if(temp == 4)
+            {
+                inAccount = token1;
+            }
+            else if(temp == 5)
+            {
+                toAccount = token1;
+            }
+            else if(temp == 6)
+            {
+                amount = token1;
+            }
+            else
+            {
+                LoggedInUser = token1;
+            }
+            getLine.erase(0, pos + delim.length());
+            temp++;
+        }
+    }
+
+    return stoi(strID);
 }
 
 class softUser{
@@ -213,6 +373,8 @@ class softUser{
     void userAddAction(string dateTime, string LoggedInUser)
     {
         int op;
+        int strID = getMaxID();
+        strID++;
         string addType = "N/A";
         string inAccount = "N/A";
         string toAccount = "N/A";
@@ -256,9 +418,9 @@ class softUser{
                     ifstream finput;
                     finput.open ("DB.txt");
                     foutput.open ("DB.txt",ios::app);
-
+                    
                     if(finput.is_open())
-                    foutput<<endl<<dateTime<<"<=>"<<addType<<"<=>"<<inAccount<<"<=>"<<toAccount<<"<=>"<<amount<<"<=>"<<LoggedInUser<<"<=>"<<note;
+                    foutput<<endl<<strID<<"<=>"<<dateTime<<"<=>"<<addType<<"<=>"<<inAccount<<"<=>"<<toAccount<<"<=>"<<amount<<"<=>"<<LoggedInUser<<"<=>"<<note;
 
                     system("cls");
                     cout<<"Add New "<<addType<<" Successfully Done"<<endl<<endl;
@@ -275,6 +437,23 @@ class softUser{
         }
     }
     
+    void userDeleteAction(string LoggedInUser)
+    {
+        string ID;
+        cout<<"Enter the ID No:"<<endl;
+        cin.ignore();
+        cin>>ID;
+        int LineNo = getLineNo(ID, LoggedInUser);
+        if(LineNo)
+        {
+            deleteLine("DB.txt",LineNo);
+        }
+        else
+        {
+            displayWrongInput();
+        }
+    }
+
     void userViewAction(string LoggedInUser)
     {
         int op;
@@ -290,28 +469,30 @@ class softUser{
             cout<<"All "<<addType<<" of User: "<<LoggedInUser<<endl<<endl;
             if(addType == "Transfer")
             {
-                cout<<"DateTime Account toAccount Amount Note"<<endl;
+                cout<<"ID_No DateTime Account toAccount Amount Note"<<endl;
             }
             else if(addType == "Tasks")
             {
-                cout<<"DateTime Status Amount Note"<<endl;
+                cout<<"ID_No DateTime Status Amount Note"<<endl;
             }
             else
             {
-                cout<<"DateTime Account Amount Note"<<endl;
+                cout<<"ID_No DateTime Account Amount Note"<<endl;
             }
             while (getline (MyRecordFile, getLine))
             {
                 splitString(getLine, LoggedInUser, addType);
             }
+            MyRecordFile.close();
             cout<<endl;
-            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<endl;
+            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<"2. Delete Item"<<endl<<endl;
             cout<<"Select Your Option:"<<endl;
             cin>>op;
             switch(op)
             {
                 case 1: system("cls"); break;
-                default: displayWrongInput();
+                case 2: userDeleteAction(LoggedInUser); break;
+                default: break; displayWrongInput();
             }
         }
     }
@@ -344,7 +525,7 @@ class softUser{
             case '1': userAddAction(getDateTime(), getLoggedInUser()); userDashboard(getLoggedInUser()); break;
             case '2': userViewAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
             case '3': userDashboard(getLoggedInUser()); break;
-            case '4': userDashboard(getLoggedInUser()); break;
+            case '4': deleteLine("DB.txt",2); userDashboard(getLoggedInUser()); break;
             case '5': break;
             default: displayWrongInput(); userDashboard(getLoggedInUser()); break;
         }
