@@ -196,6 +196,8 @@ void deleteLine(const char *file_name, int n)
         is.close();
         remove(file_name);
         rename("tempDB.txt", file_name);
+        system("cls");
+        cout<<"Delete Record Successfully Done"<<endl<<endl;
     }
 }
 
@@ -369,7 +371,6 @@ int getMaxID()
 
 class softUser{
     public:
-
     void userAddAction(string dateTime, string LoggedInUser)
     {
         int op;
@@ -440,7 +441,7 @@ class softUser{
     void userDeleteAction(string LoggedInUser)
     {
         string ID;
-        cout<<"Enter the ID No:"<<endl;
+        cout<<"Enter the Record ID No:"<<endl;
         cin.ignore();
         cin>>ID;
         int LineNo = getLineNo(ID, LoggedInUser);
@@ -485,7 +486,7 @@ class softUser{
             }
             MyRecordFile.close();
             cout<<endl;
-            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<"2. Delete Item"<<endl<<endl;
+            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<"2. Delete Record"<<endl<<endl;
             cout<<"Select Your Option:"<<endl;
             cin>>op;
             switch(op)
@@ -514,9 +515,8 @@ class softUser{
         cout<<"Action:"<<endl;
         cout<<"1. Add"<<endl;
         cout<<"2. View"<<endl;
-        cout<<"3. Edit"<<endl;
-        cout<<"4. Delete"<<endl;
-        cout<<"5. Exit"<<endl;
+        cout<<"3. Delete"<<endl;
+        cout<<"4. Exit"<<endl;
         cout<<"Select Your Option:"<<endl;
         char op;
         cin>>op;
@@ -524,9 +524,8 @@ class softUser{
         {
             case '1': userAddAction(getDateTime(), getLoggedInUser()); userDashboard(getLoggedInUser()); break;
             case '2': userViewAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
-            case '3': userDashboard(getLoggedInUser()); break;
-            case '4': deleteLine("DB.txt",2); userDashboard(getLoggedInUser()); break;
-            case '5': break;
+            case '3': userDeleteAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
+            case '4': break;
             default: displayWrongInput(); userDashboard(getLoggedInUser()); break;
         }
     }
