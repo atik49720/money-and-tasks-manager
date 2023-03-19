@@ -1,14 +1,8 @@
 ID<=>DateTime<=>addType<=>inAccount/Status<=>toAccount<=>amount<=>LoggedInUser<=>note
 1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
-1001<=>2023-02-21 21:38:07<=>Income<=>Cash<=>N/A<=>8750<=>atik<=>Salary
 1002<=>2023-03-17 11:22:48<=>Income<=>Cash<=>N/A<=>100<=>atik<=>atik
-1003<=>2023-03-17 11:23:18<=>Income<=>Bank<=>N/A<=>234<=>atik<=>sdf
+1003<=>2023-03-17 11:23:18<=>Transfer<=>Cash<=>Card<=>234<=>atik<=>sdf
+1004<=>2023-03-19 23:39:22<=>Income<=>Cash<=>N/A<=>40<=>atik<=>test
+1005<=>2023-03-19 23:39:37<=>Transfer<=>Cash<=>Bank<=>200<=>atik<=>cash in
+1006<=>2023-03-19 23:40:10<=>Transfer<=>Cash<=>Bank<=>200<=>atik<=>cash in
+1007<=>2023-03-19 23:47:00<=>Tasks<=>Pending<=>N/A<=>300<=>atik<=>atik
