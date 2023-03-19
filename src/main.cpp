@@ -2,7 +2,7 @@
 #include<fstream>
 #include<ctime>
 #include<string>
-#include<iomanip> 
+#include<iomanip>
 #include<windows.h>
 #include<conio.h>
 
@@ -39,6 +39,12 @@ void displayWrongInput()
 {
     system("cls");
     cout<<"Wrong Input!"<<endl<<endl;
+}
+
+void displayWrongInput(string message)
+{
+    system("cls");
+    cout<<message<<endl<<endl;
 }
 
 string takePasswordFromUser()
@@ -261,6 +267,72 @@ else
 }
 }
 
+int splitString(string given_str, string tmpLoggedInUser, string tmpAccount, string action)
+{
+string delim = "<=>";
+size_t pos = 0;  
+string token1;
+int temp = 1;
+string ID, DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
+while (( pos = given_str.find (delim)) != string::npos)
+{
+    token1 = given_str.substr(0, pos);
+    if(temp == 1)
+    {
+        ID = token1;
+    }
+    else if(temp == 2)
+    {
+        DateTime = token1;
+    }
+    else if(temp == 3)
+    {
+        addType = token1;
+    }
+    else if(temp == 4)
+    {
+        inAccount = token1;
+    }
+    else if(temp == 5)
+    {
+        toAccount = token1;
+    }
+    else if(temp == 6)
+    {
+        amount = token1;
+    }
+    else
+    {
+        LoggedInUser = token1;
+        if(LoggedInUser != tmpLoggedInUser)
+        {
+            return 0;
+        }
+    }
+    temp++;
+    given_str.erase(0, pos + delim.length());
+}
+note = given_str;
+if(addType == "Income" && inAccount == tmpAccount)
+{
+    return stoi(amount);
+}
+else if(addType == "Expense" && inAccount == tmpAccount)
+{
+    return stoi(amount)*(-1);
+}
+else if(addType == "Transfer" && inAccount == tmpAccount)
+{
+    return stoi(amount)*(-1);
+}
+else if(addType == "Transfer" && toAccount == tmpAccount)
+{
+    return stoi(amount);
+}
+
+return 0;
+}
+
 int getLineNo(string tmpID, string tmpLoggedInUser)
 {
     string delim = "<=>";
@@ -373,7 +445,7 @@ class softUser{
     public:
     void userAddAction(string dateTime, string LoggedInUser)
     {
-        int op;
+        int op, temp2;
         int strID = getMaxID();
         strID++;
         string addType = "N/A";
@@ -399,6 +471,7 @@ class softUser{
             {
                 cout<<"to Account:"<<endl;
                 toAccount = setAccount();
+                temp2 = getDashboardBalance(inAccount, LoggedInUser);
             }
             int temp = inAccount.compare(toAccount);
             if(temp == 0)
@@ -409,6 +482,11 @@ class softUser{
             {
                 cout<<"Amount:"<<endl;
                 cin>>amount;
+                if(addType == "Transfer" && amount>temp2)
+                {
+                    displayWrongInput("Not enough balance for transfer.");
+                    return;
+                }
                 if(amount>0)
                 {
                     cout<<"Note:"<<endl;
@@ -498,15 +576,29 @@ class softUser{
         }
     }
 
+    int getDashboardBalance(string addType, string LoggedInUser)
+    {
+        int temp = 0;
+        string action = "Calculate";
+        string getLine;
+        ifstream MyRecordFile("DB.txt");
+        while (getline (MyRecordFile, getLine))
+        {
+            temp+=splitString(getLine, LoggedInUser, addType, action);
+        }
+        MyRecordFile.close();
+        return temp;
+    }
+
     void userDashboard(string LoggedInUser)
     {
         displayHeader(getDateTime());
         cout<<"Hello, "<<LoggedInUser<<endl<<endl;
 
         cout<<"Your Balance:"<<endl;
-        cout<<"Cash: 200 BDT"<<endl;
-        cout<<"Bank: 200 BDT"<<endl;
-        cout<<"Card: 200 BDT"<<endl<<endl;
+        cout<<"Cash: "<<getDashboardBalance("Cash", LoggedInUser)<<" BDT"<<endl;
+        cout<<"Bank: "<<getDashboardBalance("Bank", LoggedInUser)<<" BDT"<<endl;
+        cout<<"Card: "<<getDashboardBalance("Card", LoggedInUser)<<" BDT"<<endl<<endl;
 
         cout<<"Your Tasks:"<<endl;
         cout<<"Pending: 20"<<endl;
@@ -516,7 +608,8 @@ class softUser{
         cout<<"1. Add"<<endl;
         cout<<"2. View"<<endl;
         cout<<"3. Delete"<<endl;
-        cout<<"4. Exit"<<endl;
+        cout<<"4. Refresh"<<endl;
+        cout<<"5. Exit"<<endl;
         cout<<"Select Your Option:"<<endl;
         char op;
         cin>>op;
@@ -525,7 +618,8 @@ class softUser{
             case '1': userAddAction(getDateTime(), getLoggedInUser()); userDashboard(getLoggedInUser()); break;
             case '2': userViewAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
             case '3': userDeleteAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
-            case '4': break;
+            case '4': system("cls"); userDashboard(getLoggedInUser()); break;
+            case '5': break;
             default: displayWrongInput(); userDashboard(getLoggedInUser()); break;
         }
     }
@@ -544,6 +638,7 @@ int main()
             break;
         }
     }
-    cout<<"Thank you for using this software.";
+    system("cls");
+    cout<<"Thank you for using this software."<<endl<<endl;
     return 0;
 }
