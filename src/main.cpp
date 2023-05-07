@@ -207,6 +207,32 @@ void deleteLine(const char *file_name, int n)
     }
 }
 
+bool validateDate(int YYYY, int MM, int DD)
+{
+    if(YYYY>=1000 && YYYY <= 3000)
+    {
+        if(MM>=1 && MM<=12)
+        {
+            if(DD>=1 && DD<=31)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+
 void splitString(string given_str, string tmpLoggedInUser, string tmpAddType)
 {
 string delim = "<=>";
@@ -257,7 +283,7 @@ while (( pos = given_str.find (delim)) != string::npos)
     given_str.erase(0, pos + delim.length());
 }
 note = given_str;
-if(tmpAddType == "Transfer")
+if(tmpAddType == "Transfer" || tmpAddType == "Tasks" )
 {
     cout<<ID<<" "<<DateTime<<" "<<inAccount<<" "<<toAccount<<" "<<amount<<" "<<note<<endl;
 }
@@ -313,6 +339,10 @@ while (( pos = given_str.find (delim)) != string::npos)
     given_str.erase(0, pos + delim.length());
 }
 note = given_str;
+if(addType == "Tasks" && inAccount == tmpAccount)
+{
+    return 1;
+}
 if(addType == "Income" && inAccount == tmpAccount)
 {
     return stoi(amount);
@@ -329,6 +359,7 @@ else if(addType == "Transfer" && toAccount == tmpAccount)
 {
     return stoi(amount);
 }
+
 
 return 0;
 }
@@ -473,6 +504,18 @@ class softUser{
                 toAccount = setAccount();
                 temp2 = getDashboardBalance(inAccount, LoggedInUser);
             }
+            if(addType == "Tasks")
+            {
+                int YYYY, MM, DD;
+                cout<<"Date: (YYYY MM DD)"<<endl;
+                cin>>YYYY>>MM>>DD;
+                if(validateDate(YYYY,MM,DD) == false)
+                {
+                    displayWrongInput();
+                    return;
+                }
+                toAccount = to_string(YYYY)+"-"+to_string(MM)+"-"+to_string(DD);
+            }
             int temp = inAccount.compare(toAccount);
             if(temp == 0)
             {
@@ -552,7 +595,7 @@ class softUser{
             }
             else if(addType == "Tasks")
             {
-                cout<<"ID_No DateTime Status Amount Note"<<endl;
+                cout<<"ID_No DateTime Status Task_Date Amount Note"<<endl;
             }
             else
             {
@@ -601,8 +644,8 @@ class softUser{
         cout<<"Card: "<<getDashboardBalance("Card", LoggedInUser)<<" BDT"<<endl<<endl;
 
         cout<<"Your Tasks:"<<endl;
-        cout<<"Pending: 20"<<endl;
-        cout<<"Complete: 20"<<endl<<endl;
+        cout<<"Pending: "<<getDashboardBalance("Pending", LoggedInUser)<<endl;
+        cout<<"Complete: "<<getDashboardBalance("Complete", LoggedInUser)<<endl<<endl;
 
         cout<<"Action:"<<endl;
         cout<<"1. Add"<<endl;
