@@ -31,7 +31,7 @@ string getDateTime()
 
 void displayHeader(string dateTime)
 {
-    cout<<"Welcome to Money and Taks Manager"<<endl;
+    cout<<"Welcome to Money and Tasks Manager"<<endl;
     cout<<"Date & Time: "<<dateTime<<endl<<endl;
 }
 
