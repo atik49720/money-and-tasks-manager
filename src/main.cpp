@@ -29,6 +29,17 @@ string getDateTime()
     return buffer;
 }
 
+void activityLog(string str, string user)
+{
+    string dateTime = getDateTime();
+
+    fstream f;
+    f.open("activityLog.txt", ios::app);
+    f <<endl<<dateTime<<"<=>"<<str<<"<=>"<<user;
+    f.close();
+
+}
+
 void displayHeader(string dateTime)
 {
     cout<<"Welcome to Money and Tasks Manager"<<endl;
@@ -125,7 +136,7 @@ int authUser(string userInput)
         }
     }
     storedUserInfo.close();
-    alertBox("Wrong User and Password.");
+    alertBox("Wrong User or Password.");
     return 0;
 }
 
@@ -202,9 +213,41 @@ void deleteLine(const char *file_name, int n)
         is.close();
         remove(file_name);
         rename("tempDB.txt", file_name);
+
         system("cls");
         cout<<"Delete Record Successfully Done"<<endl<<endl;
+        activityLog("Delete Record Successfully Done",getLoggedInUser());
     }
+}
+
+void updateLine(const string& filename, const string& newLine, int lineNum)
+{
+    ifstream fileIn(filename);
+    ofstream fileOut("tempDB.txt");
+
+    string line;
+    int currentLine = 0;
+
+    while (getline(fileIn, line))
+    {
+        currentLine++;
+
+        if (currentLine == lineNum)
+        {
+            fileOut << newLine << endl;
+        }
+        else
+        {
+            fileOut << line << endl;
+        }
+    }
+
+    fileIn.close();
+    fileOut.close();
+
+    // Rename temp file to original filename
+    remove(filename.c_str());
+    rename("tempDB.txt", filename.c_str());
 }
 
 bool validateDate(int YYYY, int MM, int DD)
@@ -420,6 +463,67 @@ int getLineNo(string tmpID, string tmpLoggedInUser)
     return 0;
 }
 
+string getUpdateLine(string tmpID, string tmpLoggedInUser)
+{
+    string delim = "<=>";
+    size_t pos = 0;  
+    string token1;
+    int Line = 0;
+    string strID, DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
+    string getLine;
+    ifstream MyRecordFile("DB.txt");
+    while (getline (MyRecordFile, getLine))
+    {
+        Line++; 
+        int temp = 1;
+        while (( pos = getLine.find (delim)) != string::npos)
+        {  
+            token1 = getLine.substr(0, pos);
+            if(temp == 1)
+            {
+                strID = token1;
+            }
+            else if(temp == 2)
+            {
+                DateTime = token1;
+            }
+            else if(temp == 3)
+            {
+                addType = token1;
+            }
+            else if(temp == 4)
+            {
+                inAccount = token1;
+            }
+            else if(temp == 5)
+            {
+                toAccount = token1;
+            }
+            else if(temp == 6)
+            {
+                amount = token1;
+            }
+            else if(temp == 7)
+            {
+                LoggedInUser = token1;
+            }
+            else
+            {
+                note = token1;
+            }
+            getLine.erase(0, pos + delim.length());
+            temp++;
+        }
+        if(strID == tmpID && inAccount == "Pending" && LoggedInUser == tmpLoggedInUser)
+        {
+            inAccount = "Complete";
+            return strID+"<=>"+DateTime+"<=>"+addType+"<=>"+inAccount+"<=>"+toAccount+"<=>"+amount+"<=>"+LoggedInUser+"<=>"+note;
+        }
+    }
+
+    return "Wrong";
+}
+
 int getMaxID()
 {
     string delim = "<=>";
@@ -530,7 +634,7 @@ class softUser{
                     displayWrongInput("Not enough balance for transfer.");
                     return;
                 }
-                if(amount>0)
+                if(amount>=0)
                 {
                     cout<<"Note:"<<endl;
                     cin.ignore();
@@ -546,6 +650,7 @@ class softUser{
 
                     system("cls");
                     cout<<"Add New "<<addType<<" Successfully Done"<<endl<<endl;
+                    activityLog("Add New "+addType+" Successfully Done",getLoggedInUser());
 
                     finput.close();
                     foutput.close();
@@ -574,6 +679,35 @@ class softUser{
         {
             displayWrongInput();
         }
+    }
+
+    void userUpdateAction(string LoggedInUser, string action)
+    {
+        if(action == "markAsComplete")
+        {
+            string ID;
+            cout<<"Enter the Record ID No:"<<endl;
+            cin.ignore();
+            cin>>ID;
+            string newLine = getUpdateLine(ID, LoggedInUser);
+            if(newLine == "Wrong")
+            {
+                displayWrongInput();
+            }
+            else
+            {
+                int LineNo = getLineNo(ID, LoggedInUser);
+                if(LineNo)
+                {
+                    updateLine("DB.txt", newLine, LineNo);
+                }
+                system("cls");
+                cout<<"Task Status Change Successfully Done"<<endl<<endl;
+                activityLog("Task Status Change Successfully Done",getLoggedInUser());
+            }
+            
+        }
+
     }
 
     void userViewAction(string LoggedInUser)
@@ -607,27 +741,40 @@ class softUser{
             }
             MyRecordFile.close();
             cout<<endl;
-            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<"2. Delete Record"<<endl<<endl;
+            cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<"2. Delete Record"<<endl;
+            if(addType == "Tasks")
+            {
+                cout<<"3. Mark As Complete";
+            }
+            cout<<endl;
             cout<<"Select Your Option:"<<endl;
             cin>>op;
             switch(op)
             {
                 case 1: system("cls"); break;
                 case 2: userDeleteAction(LoggedInUser); break;
+                if(addType=="Tasks")
+                {
+                    case 3: userUpdateAction(LoggedInUser, "markAsComplete");
+                }
                 default: break; displayWrongInput();
             }
         }
     }
 
+    void userViewActivityLog(string LoggedInUser)
+    {
+
+    }
+
     int getDashboardBalance(string addType, string LoggedInUser)
     {
         int temp = 0;
-        string action = "Calculate";
         string getLine;
         ifstream MyRecordFile("DB.txt");
         while (getline (MyRecordFile, getLine))
         {
-            temp+=splitString(getLine, LoggedInUser, addType, action);
+            temp+=splitString(getLine, LoggedInUser, addType, "Calculate");
         }
         MyRecordFile.close();
         return temp;
@@ -658,30 +805,38 @@ class softUser{
         cin>>op;
         switch(op)
         {
-            case '1': userAddAction(getDateTime(), getLoggedInUser()); userDashboard(getLoggedInUser()); break;
-            case '2': userViewAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
-            case '3': userDeleteAction(getLoggedInUser()); userDashboard(getLoggedInUser()); break;
-            case '4': system("cls"); userDashboard(getLoggedInUser()); break;
+            case '1': userAddAction(getDateTime(), LoggedInUser); userDashboard(LoggedInUser); break;
+            case '2': userViewAction(LoggedInUser); userDashboard(LoggedInUser); break;
+            case '3': userDeleteAction(LoggedInUser); userDashboard(LoggedInUser); break;
+            case '4': system("cls"); userDashboard(LoggedInUser); break;
             case '5': break;
-            default: displayWrongInput(); userDashboard(getLoggedInUser()); break;
+            default: displayWrongInput(); userDashboard(LoggedInUser); break;
         }
     }
 };
 
 int main()
 {
+    activityLog("Program Run Successfully Done", "Guest");
     displayHeader(getDateTime());
     for(int i = 1; i <= 5; i++)
     {
         if(i>1){cout<<"Remaining:"<<6-i<<endl;}
         if(authUser(userLogin()))
         {
+            activityLog("User Logged In Successfully",getLoggedInUser());
             class softUser LoggedInUser;
             LoggedInUser.userDashboard(getLoggedInUser());
             break;
         }
+        else
+        {
+            activityLog("Wrong User or Password Given", getLoggedInUser());
+        }
     }
     system("cls");
     cout<<"Thank you for using this software."<<endl<<endl;
+    activityLog("Program Close Successfully Done",getLoggedInUser());
+
     return 0;
 }
