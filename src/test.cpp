@@ -1,100 +1,44 @@
-#include<iostream>
-#include<fstream>
-#include<ctime>
-#include<string>
-#include<iomanip> 
-#include<windows.h>
-#include<conio.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
+void updateFileLine(const string& filename, const string& newLine, int lineNum)
+{
+    ifstream fileIn(filename);
+    ofstream fileOut("tempDB.txt");
 
-int splitString(string given_str, string tmpLoggedInUser, string tmpAccount, string action)
-{
-string delim = "<=>";
-size_t pos = 0;  
-string token1;
-int temp = 1;
-string ID, DateTime, addType, inAccount, toAccount, amount, LoggedInUser, note;
-while (( pos = given_str.find (delim)) != string::npos)
-{
-    token1 = given_str.substr(0, pos);
-    if(temp == 1)
+    string line;
+    int currentLine = 0;
+
+    while (getline(fileIn, line))
     {
-        ID = token1;
-    }
-    else if(temp == 2)
-    {
-        DateTime = token1;
-    }
-    else if(temp == 3)
-    {
-        addType = token1;
-    }
-    else if(temp == 4)
-    {
-        inAccount = token1;
-    }
-    else if(temp == 5)
-    {
-        toAccount = token1;
-    }
-    else if(temp == 6)
-    {
-        amount = token1;
-    }
-    else
-    {
-        LoggedInUser = token1;
-        if(LoggedInUser != tmpLoggedInUser)
+        currentLine++;
+
+        if (currentLine == lineNum)
         {
-            return 0;
+            fileOut << newLine << endl;
+        }
+        else
+        {
+            fileOut << line << endl;
         }
     }
-    temp++;
-    given_str.erase(0, pos + delim.length());
-}
-note = given_str;
-if(addType == "Income" && inAccount == tmpAccount)
-{
-    return stoi(amount);
-}
-else if(addType == "Expense" && inAccount == tmpAccount)
-{
-    return stoi(amount)*(-1);
-}
-else if(addType == "Transfer" && inAccount == tmpAccount)
-{
-    return stoi(amount)*(-1);
-}
-else if(addType == "Transfer" && toAccount == tmpAccount)
-{
-    return stoi(amount);
-}
 
-return 0;
+    fileIn.close();
+    fileOut.close();
+
+    // Rename temp file to original filename
+    remove(filename.c_str());
+    rename("tempDB.txt", filename.c_str());
 }
 
 
-int getDashboardBalance(string addType, string LoggedInUser)
-{
-    int temp = 0;
-    string action = "Calculate";
-    string getLine;
-    ifstream MyRecordFile("DB.txt");
-    while (getline (MyRecordFile, getLine))
-    {
-        temp+=splitString(getLine, LoggedInUser, addType, action);
-    }
-    MyRecordFile.close();
-    return temp;
-}
+int main() {
+
+    updateFileLine("test.txt", "ok",4);
 
 
-int main()
-{
-    // cout<<splitString("1003<=>2023-03-17 11:23:18<=>Tansfer<=>Bank<=>Cash<=>234<=>atik<=>sdf", "atik", "Bank", "Ok");
-    cout<<getDashboardBalance("Bank", "atik");
-    
     return 0;
 }
