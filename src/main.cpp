@@ -34,7 +34,7 @@ void activityLog(string str, string user)
     string dateTime = getDateTime();
 
     fstream f;
-    f.open("activityLog.txt", ios::app);
+    f.open("activityLogs.txt", ios::app);
     f <<endl<<dateTime<<"<=>"<<str<<"<=>"<<user;
     f.close();
 
@@ -336,7 +336,40 @@ else
 }
 }
 
-int splitString(string given_str, string tmpLoggedInUser, string tmpAccount, string action)
+//for view logs
+void splitString(string given_str, string tmpLoggedInUser)
+{
+string delim = "<=>";
+size_t pos = 0;  
+string token1;
+int temp = 1, flag = 0;
+string DateTime, str, LoggedInUser;
+while (( pos = given_str.find (delim)) != string::npos)
+{  
+    token1 = given_str.substr(0, pos);
+    if(temp == 1)
+    {
+        DateTime = token1;
+    }
+    else if(temp == 2)
+    {
+        str = token1;
+    }
+    temp++;
+    given_str.erase(0, pos + delim.length());
+}
+
+LoggedInUser = given_str;
+if(LoggedInUser != tmpLoggedInUser)
+{
+    return;
+}
+cout<<DateTime<<" ==> "<<str<<endl;
+
+}
+
+//for calculating dashboard balance
+int splitString(string given_str, string tmpLoggedInUser, string tmpInAccount, string action)
 {
 string delim = "<=>";
 size_t pos = 0;  
@@ -382,23 +415,31 @@ while (( pos = given_str.find (delim)) != string::npos)
     given_str.erase(0, pos + delim.length());
 }
 note = given_str;
-if(addType == "Tasks" && inAccount == tmpAccount)
-{
-    return 1;
-}
-if(addType == "Income" && inAccount == tmpAccount)
+if(tmpInAccount == "toSpend" && inAccount == "Pending")
 {
     return stoi(amount);
 }
-else if(addType == "Expense" && inAccount == tmpAccount)
+if(tmpInAccount == "Spended" && inAccount == "Complete")
+{
+    return stoi(amount);
+}
+if(addType == "Tasks" && inAccount == tmpInAccount)
+{
+    return 1;
+}
+if(addType == "Income" && inAccount == tmpInAccount)
+{
+    return stoi(amount);
+}
+else if(addType == "Expense" && inAccount == tmpInAccount)
 {
     return stoi(amount)*(-1);
 }
-else if(addType == "Transfer" && inAccount == tmpAccount)
+else if(addType == "Transfer" && inAccount == tmpInAccount)
 {
     return stoi(amount)*(-1);
 }
-else if(addType == "Transfer" && toAccount == tmpAccount)
+else if(addType == "Transfer" && toAccount == tmpInAccount)
 {
     return stoi(amount);
 }
@@ -507,13 +548,10 @@ string getUpdateLine(string tmpID, string tmpLoggedInUser)
             {
                 LoggedInUser = token1;
             }
-            else
-            {
-                note = token1;
-            }
-            getLine.erase(0, pos + delim.length());
             temp++;
+            getLine.erase(0, pos + delim.length());
         }
+        note = getLine;
         if(strID == tmpID && inAccount == "Pending" && LoggedInUser == tmpLoggedInUser)
         {
             inAccount = "Complete";
@@ -764,17 +802,36 @@ class softUser{
 
     void userViewActivityLog(string LoggedInUser)
     {
-
+        int op;
+        system("cls");
+        string getLine;
+        ifstream MyRecordFile("activityLogs.txt");
+        cout<<"All Activity Logs of User: "<<LoggedInUser<<endl<<endl;
+        cout<<"DateTime ==> Note"<<endl;
+        while (getline (MyRecordFile, getLine))
+        {
+            splitString(getLine, LoggedInUser);
+        }
+        MyRecordFile.close();
+        cout<<endl;
+        cout<<"Action:"<<endl<<"1. Back to Dashboard"<<endl<<endl;
+        cout<<"Select Your Option:"<<endl;
+        cin>>op;
+        switch(op)
+        {
+            case 1: system("cls"); break;
+            default: break; displayWrongInput();
+        }
     }
 
-    int getDashboardBalance(string addType, string LoggedInUser)
+    int getDashboardBalance(string inAccount, string LoggedInUser)
     {
         int temp = 0;
         string getLine;
         ifstream MyRecordFile("DB.txt");
         while (getline (MyRecordFile, getLine))
         {
-            temp+=splitString(getLine, LoggedInUser, addType, "Calculate");
+            temp+=splitString(getLine, LoggedInUser, inAccount, "Calculate");
         }
         MyRecordFile.close();
         return temp;
@@ -794,12 +851,17 @@ class softUser{
         cout<<"Pending: "<<getDashboardBalance("Pending", LoggedInUser)<<endl;
         cout<<"Complete: "<<getDashboardBalance("Complete", LoggedInUser)<<endl<<endl;
 
+        cout<<"Budgeting:"<<endl;
+        cout<<"To Spend: "<<getDashboardBalance("toSpend", LoggedInUser)<<" BDT"<<endl;
+        cout<<"Spended: "<<getDashboardBalance("Spended", LoggedInUser)<<" BDT"<<endl<<endl;
+
         cout<<"Action:"<<endl;
         cout<<"1. Add"<<endl;
         cout<<"2. View"<<endl;
         cout<<"3. Delete"<<endl;
-        cout<<"4. Refresh"<<endl;
-        cout<<"5. Exit"<<endl;
+        cout<<"4. View Logs"<<endl;
+        cout<<"5. Refresh"<<endl;
+        cout<<"6. Exit"<<endl;
         cout<<"Select Your Option:"<<endl;
         char op;
         cin>>op;
@@ -808,8 +870,9 @@ class softUser{
             case '1': userAddAction(getDateTime(), LoggedInUser); userDashboard(LoggedInUser); break;
             case '2': userViewAction(LoggedInUser); userDashboard(LoggedInUser); break;
             case '3': userDeleteAction(LoggedInUser); userDashboard(LoggedInUser); break;
-            case '4': system("cls"); userDashboard(LoggedInUser); break;
-            case '5': break;
+            case '4': userViewActivityLog(LoggedInUser); userDashboard(LoggedInUser); break;
+            case '5': system("cls"); userDashboard(LoggedInUser); break;
+            case '6': break;
             default: displayWrongInput(); userDashboard(LoggedInUser); break;
         }
     }
