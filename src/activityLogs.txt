@@ -1,40 +1,5 @@
-2023-05-13 19:47:31<=>Program Run Successfully Done<=>Guest
-2023-05-13 19:47:35<=>User Logged In Successfully<=>atik
-2023-05-13 19:48:20<=>Add New Income Successfully Done<=>atik
-2023-05-13 19:48:37<=>Program Close Successfully Done<=>atik
-2023-05-14 19:33:47<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:33:52<=>User Logged In Successfully<=>atik
-2023-05-14 19:44:57<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:45:01<=>User Logged In Successfully<=>selim
-2023-05-14 19:47:59<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:48:02<=>Wrong User or Password Given<=>atik
-2023-05-14 19:48:28<=>User Logged In Successfully<=>atik
-2023-05-14 19:49:36<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:49:48<=>User Logged In Successfully<=>atik
-2023-05-14 19:51:26<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:51:31<=>User Logged In Successfully<=>atik
-2023-05-14 19:52:22<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:52:25<=>User Logged In Successfully<=>atik
-2023-05-14 19:53:38<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:53:43<=>User Logged In Successfully<=>atik
-2023-05-14 19:54:10<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:54:16<=>User Logged In Successfully<=>atik
-2023-05-14 19:55:07<=>Program Close Successfully Done<=>atik
-2023-05-14 19:55:17<=>Program Run Successfully Done<=>Guest
-2023-05-14 19:55:23<=>User Logged In Successfully<=>selim
-2023-05-14 20:07:34<=>Program Run Successfully Done<=>Guest
-2023-05-14 20:07:39<=>User Logged In Successfully<=>atik
-2023-05-14 20:13:00<=>Program Run Successfully Done<=>Guest
-2023-05-14 20:13:07<=>User Logged In Successfully<=>atik
-2023-05-14 20:14:39<=>Program Run Successfully Done<=>Guest
-2023-05-14 20:14:44<=>User Logged In Successfully<=>atik
-2023-05-14 20:17:49<=>Program Run Successfully Done<=>Guest
-2023-05-14 20:17:54<=>User Logged In Successfully<=>atik
-2023-05-14 20:18:46<=>Program Run Successfully Done<=>Guest
-2023-05-14 20:19:53<=>User Logged In Successfully<=>selim
-2023-05-14 20:20:44<=>Add New Tasks Successfully Done<=>selim
-2023-05-14 20:21:02<=>Task Status Change Successfully Done<=>selim
-2023-05-14 20:24:16<=>Add New Tasks Successfully Done<=>selim
-2023-05-14 20:28:35<=>Program Run Successfully Done<=>Guest
-2023-05-14 20:28:40<=>User Logged In Successfully<=>atik
-2023-05-14 20:29:07<=>Task Status Change Successfully Done<=>atik
+
+2023-05-22 02:57:44<=>Program Run Successfully Done<=>Guest
+2023-05-22 02:57:53<=>User Logged In Successfully<=>atik
+2023-05-22 02:58:14<=>Add New Income Successfully Done<=>atik
+2023-05-22 02:58:32<=>Delete Record Successfully Done<=>atik
