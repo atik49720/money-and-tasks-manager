@@ -20,4 +20,7 @@ ID<=>DateTime<=>addType<=>inAccount/Status<=>toAccount/Date<=>amount<=>LoggedInU
 1020<=>2023-05-13 19:26:25<=>Income<=>Cash<=>N/A<=>100<=>atik<=>atik
 1021<=>2023-05-13 19:48:11<=>Income<=>Cash<=>N/A<=>100<=>atik<=>income
 1022<=>2023-05-14 20:20:00<=>Tasks<=>Complete<=>2023-5-20<=>200<=>selim<=>
-1023<=>2023-05-14 20:24:03<=>Tasks<=>Pending<=>2023-4-23<=>200<=>selim<=>ok
+1023<=>2023-05-14 20:24:03<=>Tasks<=>Complete<=>2023-4-23<=>200<=>selim<=>ok
+1024<=>2023-05-14 22:17:39<=>Tasks<=>Complete<=>2023-5-25<=>500<=>atik<=>Lagbe
+1025<=>2023-05-15 09:22:29<=>Tasks<=>Complete<=>2023-5-24<=>500<=>atik<=>buying a book
+1026<=>2023-05-21 15:31:32<=>Income<=>Cash<=>N/A<=>525<=>atik<=>paying wifi bill

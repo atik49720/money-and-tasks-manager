@@ -111,6 +111,7 @@ string takePasswordFromUser2() {
 string userLogin(){
     string user, pass;
     cout<<"Username:"<<endl;
+    cin.ignore();
     getline(cin, user);
     cout<<"Password:"<<endl;
     pass = takePasswordFromUser2();
@@ -368,6 +369,37 @@ cout<<DateTime<<" ==> "<<str<<endl;
 
 }
 
+//checking existing user when registering // action(1 = checkUser)
+int splitString(string given_str, string tmpUsername, int action)
+{
+    if(action == 1)
+    {
+        string delim = " ";
+        size_t pos = 0;
+        string token1;
+        int temp = 1, flag = 0;
+        string username;
+        while (( pos = given_str.find (delim)) != string::npos)
+        {
+            token1 = given_str.substr(0, pos);
+            if(temp == 1)
+            {
+                username = token1;
+            }
+            given_str.erase(0, pos + delim.length());
+        }
+        if(username == tmpUsername)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
+
 //for calculating dashboard balance
 int splitString(string given_str, string tmpLoggedInUser, string tmpInAccount, string action)
 {
@@ -419,7 +451,7 @@ if(tmpInAccount == "toSpend" && inAccount == "Pending")
 {
     return stoi(amount);
 }
-if(tmpInAccount == "Spended" && inAccount == "Complete")
+if(tmpInAccount == "hasSpent" && inAccount == "Complete")
 {
     return stoi(amount);
 }
@@ -562,6 +594,32 @@ string getUpdateLine(string tmpID, string tmpLoggedInUser)
     return "Wrong";
 }
 
+void registerUser(string username, string password)
+{
+    string getLine;
+    int temp;
+    ifstream MyRecordFile("users.txt");
+    while (getline (MyRecordFile, getLine))
+    {
+        temp = splitString(getLine, username, 1);
+        if(temp == 1)
+        {
+            system("cls");
+            cout<<"User Already Registered."<<endl<<endl;
+            return;
+        }
+    }
+    fstream f;
+    f.open("users.txt", ios::app);
+    f <<endl<<username<<" "<<password;
+    f.close();
+
+    MyRecordFile.close();
+    system("cls");
+    cout<<"User Registerd Succesfully."<<endl<<endl;
+    activityLog("User Registered Succesfully", username);
+}
+
 int getMaxID()
 {
     string delim = "<=>";
@@ -616,6 +674,7 @@ int getMaxID()
 
 class softUser{
     public:
+
     void userAddAction(string dateTime, string LoggedInUser)
     {
         int op, temp2;
@@ -793,9 +852,9 @@ class softUser{
                 case 2: userDeleteAction(LoggedInUser); break;
                 if(addType=="Tasks")
                 {
-                    case 3: userUpdateAction(LoggedInUser, "markAsComplete");
+                    case 3: userUpdateAction(LoggedInUser, "markAsComplete"); break;
                 }
-                default: break; displayWrongInput();
+                default: displayWrongInput(); break;
             }
         }
     }
@@ -853,7 +912,7 @@ class softUser{
 
         cout<<"Budgeting:"<<endl;
         cout<<"To Spend: "<<getDashboardBalance("toSpend", LoggedInUser)<<" BDT"<<endl;
-        cout<<"Spended: "<<getDashboardBalance("Spended", LoggedInUser)<<" BDT"<<endl<<endl;
+        cout<<"Has Spent: "<<getDashboardBalance("hasSpent", LoggedInUser)<<" BDT"<<endl<<endl;
 
         cout<<"Action:"<<endl;
         cout<<"1. Add"<<endl;
@@ -882,24 +941,63 @@ int main()
 {
     activityLog("Program Run Successfully Done", "Guest");
     displayHeader(getDateTime());
-    for(int i = 1; i <= 5; i++)
+    string username, password, cnfrmPass;
+    int op;
+    cout<<"Available Action:"<<endl;
+    cout<<"1. Login"<<endl;
+    cout<<"2. Register"<<endl;
+    cout<<"3. Exit"<<endl<<endl;
+    cout<<"Select Action: "<<endl;
+    cin>>op;
+    switch(op)
     {
-        if(i>1){cout<<"Remaining:"<<6-i<<endl;}
-        if(authUser(userLogin()))
-        {
-            activityLog("User Logged In Successfully",getLoggedInUser());
-            class softUser LoggedInUser;
-            LoggedInUser.userDashboard(getLoggedInUser());
+        case 1:
+            for(int i = 1; i <= 5; i++)
+            {
+                if(i>1){cout<<"Wrong User or Password ! Remaining: "<<6-i<<endl;}
+                if(authUser(userLogin()))
+                {
+                    activityLog("User Logged In Successfully",getLoggedInUser());
+                    class softUser LoggedInUser;
+                    LoggedInUser.userDashboard(getLoggedInUser());
+                    break;
+                }
+                else
+                {
+                    activityLog("Wrong User or Password Given", getLoggedInUser());
+                }
+            }
+            main();
             break;
-        }
-        else
-        {
-            activityLog("Wrong User or Password Given", getLoggedInUser());
-        }
+        case 2:
+            cout<<"Username: "<<endl;
+            cin.ignore();
+            getline(cin, username);
+            cout<<"Password: "<<endl;
+            password = takePasswordFromUser2();
+            cout<<"Confirm Password: "<<endl;
+            cnfrmPass = takePasswordFromUser2();
+
+            if(password == cnfrmPass)
+            {
+                registerUser(username, password);
+                main();
+            }
+            else
+            {
+                system("cls");
+                cout<<"Confirm Password Not Matched."<<endl<<endl;
+                main();
+            }
+            break;
+
+        case 3: break;
+
+        default: displayWrongInput(); main(); break;
     }
     system("cls");
     cout<<"Thank you for using this software."<<endl<<endl;
-    activityLog("Program Close Successfully Done",getLoggedInUser());
+    activityLog("Program Close Successfully Done","Guest");
 
     return 0;
 }
